@@ -9,7 +9,6 @@ MainFrame::MainFrame(const wxString& title) : wxFrame(nullptr, wxID_ANY, title) 
 	createGUI();
 	bindEventHandlers();
 	initCfg();
-
 }
 
 void MainFrame::createGUI() {
@@ -43,7 +42,6 @@ void MainFrame::createGUI() {
 
 	CreateStatusBar();
 	wxLogStatus("Not Running");
-
 }
 
 void MainFrame::bindEventHandlers() {
@@ -55,7 +53,6 @@ void MainFrame::bindEventHandlers() {
 	bindLeft->Bind(wxEVT_BUTTON, &MainFrame::onLeftBind, this);
 	bindRight->Bind(wxEVT_BUTTON, &MainFrame::onRightBind, this);
 	saveButton->Bind(wxEVT_BUTTON, &MainFrame::onSaveClicked, this);
-
 }
 
 // Disable and enable buttons based on binding keys
@@ -68,7 +65,6 @@ void MainFrame::toggleButtons(bool buttonsEnabled) {
 		bindLeft->Disable();
 		bindRight->Disable();
 		saveButton->Disable();
-
 	}
 	else {
 
@@ -78,7 +74,6 @@ void MainFrame::toggleButtons(bool buttonsEnabled) {
 		bindLeft->Enable();
 		bindRight->Enable();
 		saveButton->Enable();
-
 	}
 }
 
@@ -91,7 +86,6 @@ void MainFrame::toggleButtonsOnInit(bool running) {
 		bindLeft->Disable();
 		bindRight->Disable();
 		saveButton->Disable();
-
 	}
 	else {
 
@@ -100,7 +94,6 @@ void MainFrame::toggleButtonsOnInit(bool running) {
 		bindLeft->Enable();
 		bindRight->Enable();
 		saveButton->Enable();
-
 	}
 }
 
@@ -110,7 +103,6 @@ void MainFrame::initCfg() {
 	slider->SetValue(profile.yawSpeed);
 	leftCtrl->SetValue(profile.leftBind);
 	rightCtrl->SetValue(profile.rightBind);
-
 }
 
 void MainFrame::startClicked(wxCommandEvent& evt) {
@@ -124,9 +116,6 @@ void MainFrame::startClicked(wxCommandEvent& evt) {
 	spinner.keyListener();
 
 	wxLogStatus("Running");
-
-	//evt.Skip();
-
 }
 
 void MainFrame::stopClicked(wxCommandEvent& evt) {
@@ -137,13 +126,11 @@ void MainFrame::stopClicked(wxCommandEvent& evt) {
 	toggleButtonsOnInit(false);
 
 	wxLogStatus("Terminated");
-
 }
 
 void MainFrame::onSliderChanged(wxCommandEvent& evt) {
 
-	profile.setYawSpeed(slider->GetValue());
-	
+	profile.setYawSpeed(slider->GetValue());	
 }
 
 void MainFrame::onLeftBind(wxCommandEvent& evt) {
@@ -155,8 +142,7 @@ void MainFrame::onLeftBind(wxCommandEvent& evt) {
 		bindLeft->Disable();
 		toBind = 1;
 
-		toggleButtons(false);
-		
+		toggleButtons(false);		
 	}
 	evt.Skip();
 }
@@ -171,7 +157,6 @@ void MainFrame::onRightBind(wxCommandEvent& evt) {
 		toBind = 2;
 
 		toggleButtons(false);
-
 	}
 	evt.Skip();
 }
@@ -203,47 +188,9 @@ void MainFrame::onKeyBindPress(wxKeyEvent& evt) {
 		}
 		awaitingKeyPress = false;
 		toggleButtons(true);
-
 	}
 	evt.Skip();
 }
-
-// Honestly just keeping this for future reference
-//void MainFrame::running(wxKeyEvent& evt) {
-//
-//	// Handling left spins
-//	int key = evt.GetKeyCode();
-//	wxLogStatus(wxString::Format("Key Pressed: %d", key));
-//	if (key == std::stoi(profile.leftBind)) {
-//		if (spinner.direction == 1 && spinner.spinning) {
-//			wxLogStatus("Stopped Spinning");
-//			spinner.centerCursor();
-//			spinner.spinning = false;
-//		}
-//		else {
-//			wxLogStatus("Spinning Left");
-//			spinner.centerCursor();
-//			spinner.direction = 1;
-//			spinner.spinning = true;
-//			spinner.spin();
-//		}
-//	}
-//		// Handling right spins
-//	else if (key == std::stoi(profile.rightBind)) {
-//		if (spinner.direction == -1 && spinner.spinning) {
-//			wxLogStatus("Stopped Spinning");
-//			spinner.centerCursor();
-//			spinner.spinning = false;
-//		}
-//		else {
-//			wxLogStatus("Spinning Right");
-//			spinner.centerCursor();
-//			spinner.direction = -1;
-//			spinner.spinning = true;
-//			spinner.spin();
-//		}
-//	}
-//}
 
 void MainFrame::onSaveClicked(wxCommandEvent& evt) {
 

@@ -46,6 +46,7 @@ void Spinner::initSpinner(Profile& profile) {
 
 void Spinner::spin(int& dir) {
 
+    // Put in another file
     InjectMouseInput_t InjectMouseInput;
 
     const HMODULE user32 = LoadLibraryA("user32.dll");
