@@ -3,6 +3,39 @@
 #include <chrono>
 #include <thread>
 
+
+// Mouse injection code from SamuelTulach on GitHub.
+enum InjectedInputMouseOptions
+{
+    Absolute = 32768,
+    HWheel = 4096,
+    LeftDown = 2,
+    LeftUp = 4,
+    MiddleDown = 32,
+    MiddleUp = 64,
+    Move = 1,
+    MoveNoCoalesce = 8192,
+    None = 0,
+    RightDown = 8,
+    RightUp = 16,
+    VirtualDesk = 16384,
+    Wheel = 2048,
+    XDown = 128,
+    XUp = 256
+};
+
+typedef struct _InjectedInputMouseInfo
+{
+    int DeltaX;
+    int DeltaY;
+    unsigned int MouseData;
+    InjectedInputMouseOptions MouseOptions;
+    unsigned int TimeOffsetInMilliseconds;
+    void* ExtraInfo;
+} InjectedInputMouseInfo;
+
+typedef bool (WINAPI* InjectMouseInput_t)(InjectedInputMouseInfo* inputs, int count);
+
 void Spinner::initSpinner(Profile& profile) {
 
 	yawSpeed = profile.yawSpeed;
@@ -13,42 +46,31 @@ void Spinner::initSpinner(Profile& profile) {
 
 void Spinner::spin(int& dir) {
 
-	//SetCursorPos(cursorPos.x, cursorPos.y);
+    InjectMouseInput_t InjectMouseInput;
 
+    const HMODULE user32 = LoadLibraryA("user32.dll");
+
+    if (user32) {
+        InjectMouseInput = reinterpret_cast<InjectMouseInput_t>(GetProcAddress(user32, "InjectMouseInput"));
+        if (!InjectMouseInput) {
+            return;
+        }
+    }
+    
 	std::thread timerThread([&]() {
-
-        POINT cursorPos;
-        GetCursorPos(&cursorPos);
 
 		while (spinning) {
 
-            int x = cursorPos.x;
+            InjectedInputMouseInfo info = { 0 };
+            info.DeltaX = 5 * yawSpeed * direction;
+            InjectMouseInput(&info, 1);
+            Sleep(1);
 
-            if (dir == 1) {
-                x += (yawSpeed * direction);
-            }
-            else if (dir == -1) {
-                x -= (yawSpeed * direction);
-            }
-			
-			GetCursorPos(&cursorPos);
-			SetCursorPos(x, cursorPos.y);
-
-			std::this_thread::sleep_for(std::chrono::milliseconds(10));
 			}
 		});
 
 	timerThread.detach();
 	
-}
-
-void Spinner::centerCursor() {
-	int screenWidth = GetSystemMetrics(SM_CXSCREEN);
-	int screenHeight = GetSystemMetrics(SM_CYSCREEN);
-	int centerX = screenWidth / 2;
-	int centerY = screenHeight / 2;
-
-	SetCursorPos(centerX, centerY);
 }
 
 void Spinner::keyListener() {
@@ -58,12 +80,12 @@ void Spinner::keyListener() {
             if (GetAsyncKeyState('X') & 0x8000) {
                 // Perform left turn logic
                 if (direction == 1 && spinning) {
+
                     direction = 1;
                     spinning = false;
-                    centerCursor();
                 }
                 else {
-                    centerCursor();
+      
                     direction = 1;
                     spinning = true;
                     spin(direction);
@@ -73,20 +95,19 @@ void Spinner::keyListener() {
             if (GetAsyncKeyState('Z') & 0x8000) {
                 // Perform right turn logic
                 if (direction == -1 && spinning) {
+
                     direction = -1;
-                    spinning = false;
-                    centerCursor();      
+                    spinning = false;    
                 }
                 else {
-                    centerCursor();
+
                     direction = -1;
                     spinning = true;
                     spin(direction);
                 }
             }
 
-            // Add a small delay to avoid high CPU usage
-            Sleep(5);
+            Sleep(1);
         }
         });
 
