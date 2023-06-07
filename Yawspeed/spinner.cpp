@@ -51,12 +51,7 @@ void Spinner::spin(int& dir) {
 
     const HMODULE user32 = LoadLibraryA("user32.dll");
 
-    if (user32) {
-        InjectMouseInput = reinterpret_cast<InjectMouseInput_t>(GetProcAddress(user32, "InjectMouseInput"));
-        if (!InjectMouseInput) {
-            return;
-        }
-    }
+    InjectMouseInput = reinterpret_cast<InjectMouseInput_t>(GetProcAddress(user32, "InjectMouseInput"));
     
 	std::thread timerThread([&]() {
 
