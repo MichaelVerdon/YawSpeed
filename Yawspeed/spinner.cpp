@@ -61,12 +61,10 @@ void Spinner::spin(int& dir) {
             info.DeltaX = 5 * yawSpeed * direction;
             InjectMouseInput(&info, 1);
             Sleep(1);
-
 			}
 		});
 
 	timerThread.detach();
-	
 }
 
 void Spinner::keyListener() {
